@@ -19,40 +19,44 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
 
-        user = findViewById(R.id.editText);
-        pass = findViewById(R.id.editText2);
-        login = findViewById(R.id.button);
-        register = findViewById(R.id.register);
+            user = findViewById(R.id.editText);
+            pass = findViewById(R.id.editText2);
+            login = findViewById(R.id.button);
+            register = findViewById(R.id.register);
 
-        appDatabase = AppDatabase.geAppdatabase(MainActivity.this);
+            appDatabase = AppDatabase.geAppdatabase(MainActivity.this);
 
-        RoomDAO roomDAO = appDatabase.getRoomDAO();
-        UsernamePassword temp = roomDAO.getLoggedInUser();
-        if(temp!=null){
-            Intent intent = new Intent(MainActivity.this,MainPage.class);
-            startActivity(intent);
-            finish();
-        }
-
-
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginUser(user.getText().toString().trim(),pass.getText().toString().trim());
-            }
-        });
-
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,Register.class);
+            RoomDAO roomDAO = appDatabase.getRoomDAO();
+            UsernamePassword temp = roomDAO.getLoggedInUser();
+            if (temp != null) {
+                Intent intent = new Intent(MainActivity.this, MainPage.class);
                 startActivity(intent);
                 finish();
             }
-        });
+
+
+            login.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    loginUser(user.getText().toString().trim(), pass.getText().toString().trim());
+                }
+            });
+
+            register.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, Register.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(this, "Hello", Toast.LENGTH_LONG).show();
+        }
 
     }
 

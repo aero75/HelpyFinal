@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">MyApp</string>
+    <string name="app_name">Helpy</string>
+    <string name="helpy_hype">Helpy, the only reminder app you are gonna need!</string>
 </resources>

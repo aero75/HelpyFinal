@@ -13,9 +13,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="130dp"
         android:layout_marginBottom="75dp"
-        android:textSize="35dp"
+        android:text="@string/helpy_hype"
         android:textAlignment="center"
-        android:text="Login" />
+        android:textSize="20dp" />
 
     <EditText
         android:id="@+id/editText"

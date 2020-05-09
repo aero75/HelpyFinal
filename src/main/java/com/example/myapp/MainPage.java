@@ -41,27 +41,31 @@ public class MainPage extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_page);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main_page);
 
-        appDatabase = AppDatabase.geAppdatabase(MainPage.this);
+            appDatabase = AppDatabase.geAppdatabase(MainPage.this);
 
-        add = findViewById(R.id.floatingButton);
-        empty = findViewById(R.id.empty);
+            add = findViewById(R.id.floatingButton);
+            empty = findViewById(R.id.empty);
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addReminder();
-            }
-        });
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addReminder();
+                }
+            });
 
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainPage.this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        setItemsInRecyclerView();
+            recyclerView = findViewById(R.id.recyclerView);
+            recyclerView.setHasFixedSize(true);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainPage.this);
+            recyclerView.setLayoutManager(linearLayoutManager);
+            setItemsInRecyclerView();
+    }
 
+    public void deleteReminder(Reminders reminders) {
+        RoomDAO roomDAO = appDatabase.getRoomDAO();
+        roomDAO.Delete(reminders);
     }
 
     public void addReminder(){
@@ -111,45 +115,49 @@ public class MainPage extends AppCompatActivity {
             }
         });
 
+        try {
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                    RoomDAO roomDAO = appDatabase.getRoomDAO();
+                    Reminders reminders = new Reminders();
+                    reminders.setMessage(message.getText().toString().trim());
+                    Date remind = new Date(textView.getText().toString().trim());
+                    reminders.setRemindDate(remind);
+                    roomDAO.Insert(reminders);
+                    List<Reminders> l = roomDAO.getAll();
+                    reminders = l.get(l.size() - 1);
+                    Log.e("ID chahiye", reminders.getId() + "");
 
-                RoomDAO roomDAO = appDatabase.getRoomDAO();
-                Reminders reminders = new Reminders();
-                reminders.setMessage(message.getText().toString().trim());
-                Date remind = new Date(textView.getText().toString().trim());
-                reminders.setRemindDate(remind);
-                roomDAO.Insert(reminders);
-                List<Reminders> l = roomDAO.getAll();
-                reminders = l.get(l.size()-1);
-                Log.e("ID chahiye",reminders.getId()+"");
+                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"));
+                    calendar.setTime(remind);
+                    calendar.set(Calendar.SECOND, 0);
+                    Intent intent = new Intent(MainPage.this, NotifierAlarm.class);
+                    intent.putExtra("Message", reminders.getMessage());
+                    intent.putExtra("RemindDate", reminders.getRemindDate().toString());
+                    intent.putExtra("id", reminders.getId());
+                    PendingIntent intent1 = PendingIntent.getBroadcast(MainPage.this, reminders.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent1);
 
-                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"));
-                calendar.setTime(remind);
-                calendar.set(Calendar.SECOND,0);
-                Intent intent = new Intent(MainPage.this,NotifierAlarm.class);
-                intent.putExtra("Message",reminders.getMessage());
-                intent.putExtra("RemindDate",reminders.getRemindDate().toString());
-                intent.putExtra("id",reminders.getId());
-                PendingIntent intent1 = PendingIntent.getBroadcast(MainPage.this,reminders.getId(),intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),intent1);
+                    Toast.makeText(MainPage.this, "Inserted Successfully", Toast.LENGTH_SHORT).show();
+                    setItemsInRecyclerView();
+                    AppDatabase.destroyInstance();
+                    dialog.dismiss();
 
-                Toast.makeText(MainPage.this,"Inserted Successfully", Toast.LENGTH_SHORT).show();
-                setItemsInRecyclerView();
-                AppDatabase.destroyInstance();
-                dialog.dismiss();
-
-            }
-        });
-
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(this, "Enter something", Toast.LENGTH_LONG);
+        }
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
     }
+
+
 
     public void setItemsInRecyclerView(){
 
